@@ -5,6 +5,8 @@ using UnityEngine;
 public class Shooter : MonoBehaviour {
 
     public ShooterData Data;
+    public GameObject Visual;
+    public Transform CameraSocket;
 
 	// Use this for initialization
 	void Start () {
@@ -15,4 +17,15 @@ public class Shooter : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    /// <summary>
+    /// Set this guy's team color.
+    /// </summary>
+    public void SetTeamColor(Material teamColor)
+    {
+        foreach(var renderer in Visual.GetComponentsInChildren<Renderer>())
+        {
+            renderer.material = teamColor;
+        }
+    }
 }

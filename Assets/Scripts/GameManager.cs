@@ -4,21 +4,54 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager> {
 
-    public const int TeamSize = 4;
+    // Consts
     public const int TeamCount = 2;
+
+    // Editor Data
+    public List<TeamData> TeamData;
+    public GameCamera GameCamera;
+
+    // Public Data
     public List<Shooter>[] Teams = new List<Shooter>[TeamCount];
+    public List<Player> Players = new List<Player>();
+
+    // Private data
+    private Player m_currentPlayer;
 
 	// Use this for initialization
 	void Start () {
 
+        // Create the players
+        CreatePlayers();
+
         // Create all of the teams.
         CreateTeams();
+
+        // Position the teams on the grid.
+        PositionTeams();
     }
 	
 	// Update is called once per frame
-	void Update () {
-		
+	void Update ()
+    {
+        // Update the current player each frame.
+        m_currentPlayer.Update();
 	}
+
+    /// <summary>
+    /// Create some players.
+    /// </summary>
+    private void CreatePlayers()
+    {
+        for(int i = 0; i < TeamCount; i++)
+        {
+            var player = new Player(i);
+            Players.Add(player);
+        }
+
+        // Set the starting player.
+        m_currentPlayer = Players[0];
+    }
 
     /// <summary>
     /// Create the teams and all shooters on the teams.
@@ -27,7 +60,27 @@ public class GameManager : Singleton<GameManager> {
     {
         for (int i = 0; i < TeamCount; i++)
         {
-            Teams[i] = ShooterFactory.CreateShooterTeam(i, TeamSize);
+            Teams[i] = ShooterFactory.CreateShooterTeam(i, TeamData[i]);
+        }
+    }
+
+    /// <summary>
+    /// After the teams are created, position them on the tiles.
+    /// </summary>
+    private void PositionTeams()
+    {
+        // Set up each team.
+        for(int t = 0; t < Teams.Length; t++)
+        {
+            for(int i = 0; i < Teams[t].Count; i++)
+            {
+                var team = Teams[t];
+                Vector2 tilePosition = TeamData[t].StartingPositions[i];
+                team[i].transform.position = new Vector3(
+                    tilePosition.x * MapTile.Width,
+                    0, // For now use 0. Later, get the tile at this position and get its height.
+                    tilePosition.y * MapTile.Width);
+            }
         }
     }
 }

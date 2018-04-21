@@ -11,13 +11,13 @@ public static class ShooterFactory
     /// Create an entire team of shooters.
     /// </summary>
     /// <returns></returns>
-    public static List<Shooter> CreateShooterTeam(int team, int teamSize)
+    public static List<Shooter> CreateShooterTeam(int team, TeamData teamData)
     {
         List<Shooter> shooterList = new List<Shooter>();
 
-        for(int i = 0; i < teamSize; i++)
+        for(int i = 0; i < teamData.TeamSize; i++)
         {
-            Shooter shooter = CreateShooter(team);
+            Shooter shooter = CreateShooter(team, teamData);
             shooterList.Add(shooter);
         }
 
@@ -28,11 +28,13 @@ public static class ShooterFactory
     /// Create a single shooter.
     /// </summary>
     /// <returns></returns>
-    public static Shooter CreateShooter(int team)
+    public static Shooter CreateShooter(int team, TeamData data)
     {
         var shooterResource = Resources.Load(DefaultShooterPath);
         GameObject shooterObject = GameObject.Instantiate(shooterResource) as GameObject;
         Shooter shooter = shooterObject.GetComponent<Shooter>();
+
+        shooter.SetTeamColor(data.TeamColor);
 
         return shooter;
     }
