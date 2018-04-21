@@ -8,6 +8,10 @@ public class Shooter : MonoBehaviour {
     public GameObject Visual;
     public Transform CameraSocket;
 
+    public Vector2 TilePosition;
+
+    public int TeamId { get; set; }
+
 	// Use this for initialization
 	void Start () {
 		

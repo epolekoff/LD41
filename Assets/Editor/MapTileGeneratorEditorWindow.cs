@@ -3,9 +3,7 @@ using UnityEditor;
 
 public class MapTileGeneratorEditorWindow : EditorWindow
 {
-    public int Width;
-    public int Height;
-    public GameObject Parent;
+    public GameObject Map;
     public GameObject MapTilePrefab;
 
     // Add menu item to the Window menu
@@ -19,26 +17,31 @@ public class MapTileGeneratorEditorWindow : EditorWindow
 
     void OnGUI()
     {
-
-        Width = EditorGUILayout.IntField("Width", Width);
-        Height = EditorGUILayout.IntField("Height", Height);
-        Parent = (GameObject)EditorGUILayout.ObjectField("Parent", Parent, typeof(GameObject), allowSceneObjects: true);
+        Map = (GameObject)EditorGUILayout.ObjectField("Map", Map, typeof(GameObject), allowSceneObjects: true);
         MapTilePrefab = (GameObject)EditorGUILayout.ObjectField("Map Tile", MapTilePrefab, typeof(GameObject), allowSceneObjects: false);
 
         // Generate all of the map tiles.
         if (GUILayout.Button("Generate"))
         {
-            for(int x = 0; x < Width; x++)
+            GameMap gameMap = Map.GetComponent<GameMap>();
+            for(int x = 0; x < gameMap.Width; x++)
             {
-                for(int y = 0; y < Height; y++)
+                for(int y = 0; y < gameMap.Height; y++)
                 {
-                    GameObject.Instantiate(
+                    var mapTileObject = GameObject.Instantiate(
                         MapTilePrefab, 
                         new Vector3(
                             x * MapTile.Width, 
                             0,
                             y * MapTile.Width), 
-                        Quaternion.identity, Parent.transform);
+                        Quaternion.identity, Map.transform);
+
+                    // Initialize the map.
+                    MapTile mapTile = mapTileObject.GetComponent<MapTile>();
+                    mapTile.transform.name = string.Format("MapTile({0},{1})", x, y);
+                    mapTile.Position = new Vector2(x, y);
+
+                    gameMap.RegisterMapTile(mapTile.Position, mapTile);
                 }
             }
         }

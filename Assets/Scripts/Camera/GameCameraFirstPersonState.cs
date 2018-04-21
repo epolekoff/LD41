@@ -31,8 +31,6 @@ public class GameCameraFirstPersonState : AbsState
     public override void Update(IStateMachineEntity entity)
     {
         HandleInput((GameCamera)entity);
-
-        Debug.Log(rotationY);
     }
 
     /// <summary>

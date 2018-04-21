@@ -35,6 +35,7 @@ public static class ShooterFactory
         Shooter shooter = shooterObject.GetComponent<Shooter>();
 
         shooter.SetTeamColor(data.TeamColor);
+        shooter.TeamId = team;
 
         return shooter;
     }

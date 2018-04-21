@@ -10,6 +10,7 @@ public class GameManager : Singleton<GameManager> {
     // Editor Data
     public List<TeamData> TeamData;
     public GameCamera GameCamera;
+    public GameMap Map;
 
     // Public Data
     public List<Shooter>[] Teams = new List<Shooter>[TeamCount];
@@ -76,11 +77,12 @@ public class GameManager : Singleton<GameManager> {
             {
                 var team = Teams[t];
                 Vector2 tilePosition = TeamData[t].StartingPositions[i];
-                team[i].transform.position = new Vector3(
-                    tilePosition.x * MapTile.Width,
-                    0, // For now use 0. Later, get the tile at this position and get its height.
-                    tilePosition.y * MapTile.Width);
+
+                // Record the player on that tile.
+                Map.MoveObjectToTile(team[i], (int)tilePosition.x, (int)tilePosition.y, firstTimeSetup: true);
             }
         }
     }
+
+    
 }
