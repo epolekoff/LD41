@@ -8,7 +8,8 @@ public enum PlayerState
     SelectingUnit,
     ViewingEnemy,
     MovingUnit,
-    Shooting
+    Shooting,
+    WatchingBullet
 }
 
 public class Player
@@ -20,6 +21,9 @@ public class Player
 
     private PlayerState m_currentState = PlayerState.SelectingUnit;
     private Shooter m_selectedShooter;
+
+    private float m_turnTimer = 0f;
+    private const float MaxTurnTimer = 5f;
 
     /// <summary>
     /// Constructor.
@@ -36,7 +40,8 @@ public class Player
 	public void Update ()
     {
         HandleInput();
-	}
+        HandleTurnTimer();
+    }
 
     /// <summary>
     /// Tell me it's my turn now.
@@ -44,6 +49,28 @@ public class Player
     public void SetMyTurn()
     {
         m_currentState = PlayerState.SelectingUnit;
+    }
+
+    /// <summary>
+    /// Turn counts down, you fire at the end.
+    /// </summary>
+    private void HandleTurnTimer()
+    {
+        if (m_turnTimer > 0)
+        {
+            m_turnTimer -= Time.deltaTime;
+        }
+
+        // Update the UI.
+        if(m_selectedShooter != null)
+        {
+            GameManager.Instance.GameCanvas.FirstPersonCanvas.SetTimer(m_turnTimer, MaxTurnTimer, m_selectedShooter.TeamColor);
+        }
+        
+        if(m_turnTimer <= 0)
+        {
+            FireBullet();
+        }
     }
 
     /// <summary>
@@ -167,6 +194,7 @@ public class Player
                 GameManager.Instance.GameCamera.TransitionToFirstPerson(selectedShooter);
                 m_selectedShooter.HideVisual();
                 m_currentState = PlayerState.Shooting;
+                m_turnTimer = MaxTurnTimer;
             });
 
             // Clear all highlights
@@ -192,6 +220,9 @@ public class Player
 
         // Fire 1 bullet
         m_selectedShooter.Fire(OnBulletDestroyed);
+
+        // Set the state to watching the bullet
+        m_currentState = PlayerState.WatchingBullet;
     }
 
     /// <summary>

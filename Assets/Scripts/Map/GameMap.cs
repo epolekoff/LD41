@@ -126,6 +126,13 @@ public class GameMap : MonoBehaviour
             return false;
         }
 
+        // Check if there are any obstacles on the tile.
+        MapTile tile = MapTiles[tilePosition];
+        if(tile.Obstacle != null)
+        {
+            return false;
+        }
+
         return true;
     }
 

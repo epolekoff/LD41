@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class GameCameraFirstPersonState : AbsState
 {
-    public float sensitivityX = 8F;
-    public float sensitivityY = 8F;
+    public float sensitivityX = 6F;
+    public float sensitivityY = 6F;
 
     public float minimumX = -360F;
     public float maximumX = 360F;

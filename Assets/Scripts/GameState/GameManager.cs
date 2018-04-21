@@ -11,6 +11,7 @@ public class GameManager : Singleton<GameManager> {
     public List<TeamData> TeamData;
     public GameCamera GameCamera;
     public GameMap Map;
+    public GameCanvas GameCanvas;
 
     // Public Data
     public List<Shooter>[] Teams = new List<Shooter>[TeamCount];

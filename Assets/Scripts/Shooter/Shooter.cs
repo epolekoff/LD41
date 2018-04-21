@@ -15,7 +15,7 @@ public class Shooter : MonoBehaviour {
 
     public int TeamId { get; set; }
 
-    private Material m_teamColor;
+    public Material TeamColor;
 
     private int m_currentHealth;
 
@@ -43,7 +43,7 @@ public class Shooter : MonoBehaviour {
         {
             renderer.material = teamColor;
         }
-        m_teamColor = teamColor;
+        TeamColor = teamColor;
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class Shooter : MonoBehaviour {
     {
         var bulletObject = GameObject.Instantiate(BulletPrefab, BulletSpawnPoint.transform.position, Quaternion.identity) as GameObject;
         bulletObject.GetComponent<Rigidbody>().AddForce(CameraSocket.forward * 1000f);
-        bulletObject.GetComponent<Bullet>().SetTeamColor(m_teamColor);
+        bulletObject.GetComponent<Bullet>().SetTeamColor(TeamColor);
         bulletObject.GetComponent<Bullet>().OnDestroyed += onDestroyed;
     }
 

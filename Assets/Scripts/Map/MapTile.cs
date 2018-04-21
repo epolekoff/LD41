@@ -30,6 +30,11 @@ public class MapTile : MonoBehaviour
     /// </summary>
     public Vector2 Position;
 
+    /// <summary>
+    /// If an obstacle is attached to this tile, it here.
+    /// </summary>
+    public Obstacle Obstacle;
+
 	// Use this for initialization
 	void Start () {
         RegisterMapTile(GameManager.Instance.Map, Position, this);

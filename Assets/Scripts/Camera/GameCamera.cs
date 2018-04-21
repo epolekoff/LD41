@@ -93,6 +93,8 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
         // Move the camera
         StartCoroutine(LerpCameraToRotation( () =>
         {
+            // Show the First Person Canvas.
+            GameManager.Instance.GameCanvas.FirstPersonCanvas.gameObject.SetActive(true);
         }));
     }
 
@@ -114,6 +116,9 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
         // Change the state machine state
         m_currentMode = CameraMode.ThirdPerson;
         m_stateMachine.ChangeState(new GameCameraThirdPersonState());
+
+        // Hide the First Person Canvas.
+        GameManager.Instance.GameCanvas.FirstPersonCanvas.gameObject.SetActive(false);
 
         // Move the camera
         StartCoroutine(LerpCameraToRotation(() =>
