@@ -40,6 +40,17 @@ public class GameManager : Singleton<GameManager> {
 	}
 
     /// <summary>
+    /// Tell the next player that they are up.
+    /// </summary>
+    public void SetNextPlayerTurn()
+    {
+        int currentPlayerNumber = m_currentPlayer.Number;
+        int nextPlayerNumber = (int)Mathf.Repeat(++currentPlayerNumber, 2);
+        m_currentPlayer = Players[nextPlayerNumber];
+        m_currentPlayer.SetMyTurn();
+    }
+
+    /// <summary>
     /// Create some players.
     /// </summary>
     private void CreatePlayers()

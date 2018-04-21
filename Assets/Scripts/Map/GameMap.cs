@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameMap : MonoBehaviour
 {
+    private const float ValidNeighborHeightDifference = 1;
+
     public int Width;
     public int Height;
 
@@ -27,22 +29,6 @@ public class GameMap : MonoBehaviour
 	}
 
     /// <summary>
-    /// When creating the map tiles, hook them up to be reverse engineered.
-    /// </summary>
-    public void RegisterMapTile(Vector2 position, MapTile tile)
-    {
-        // If the tile was already registered, remove it.
-        if(MapTiles.ContainsKey(position))
-        {
-            GameObject.Destroy(MapTiles[position]);
-            MapTiles.Remove(position);
-        }
-
-        // Register the new tile.
-        MapTiles.Add(position, tile);
-    }
-
-    /// <summary>
     /// Get the shooter on a tile, or null if there is none.
     /// </summary>
     public Shooter GetShooterOnTile(Vector2 tile)
@@ -61,7 +47,7 @@ public class GameMap : MonoBehaviour
     /// <summary>
     /// Move an object to a new tile. Record where it is now.
     /// </summary>
-    public void MoveObjectToTile(Shooter shooter, int x, int y, bool firstTimeSetup = false)
+    public void MoveObjectToTile(Shooter shooter, int x, int y, bool firstTimeSetup = false, System.Action callback = null)
     {
         // Get the shooter's old position
         Vector2 oldPosition = shooter.TilePosition;
@@ -75,7 +61,7 @@ public class GameMap : MonoBehaviour
         // Move the game object
         Vector3 desiredPosition = new Vector3(
             x * MapTile.Width,
-            0, // For now use 0. Later, get the tile at this position and get its height.
+            MapTiles[shooter.TilePosition].Height,
             y * MapTile.Width);
         if (firstTimeSetup)
         {
@@ -83,7 +69,7 @@ public class GameMap : MonoBehaviour
         }
         else
         {
-            StartCoroutine(LerpObjectToPosition(shooter.transform, desiredPosition, distanceTraveled));
+            StartCoroutine(LerpObjectToPosition(shooter.transform, desiredPosition, distanceTraveled, callback));
         }
 
         // Delete the object from the old position
@@ -101,6 +87,8 @@ public class GameMap : MonoBehaviour
         int x = (int)tilePosition.x;
         int y = (int)tilePosition.y;
 
+        MapTile mapTile = MapTiles[tilePosition];
+
         List<Vector2> neighbors = new List<Vector2>();
 
         Vector2 left    = new Vector2(x - 1, y);
@@ -108,13 +96,13 @@ public class GameMap : MonoBehaviour
         Vector2 up      = new Vector2(x, y - 1);
         Vector2 down    = new Vector2(x, y + 1);
 
-        if(IsValidTile(left))
+        if (IsValidTile(left) && Mathf.Abs(MapTiles[left].Height - mapTile.Height) <= ValidNeighborHeightDifference)
             neighbors.Add(left);
-        if (IsValidTile(right))
+        if (IsValidTile(right) && Mathf.Abs(MapTiles[right].Height - mapTile.Height) <= ValidNeighborHeightDifference)
             neighbors.Add(right);
-        if (IsValidTile(up))
+        if (IsValidTile(up) && Mathf.Abs(MapTiles[up].Height - mapTile.Height) <= ValidNeighborHeightDifference)
             neighbors.Add(up);
-        if (IsValidTile(down))
+        if (IsValidTile(down) && Mathf.Abs(MapTiles[down].Height - mapTile.Height) <= ValidNeighborHeightDifference)
             neighbors.Add(down);
 
         return neighbors;
@@ -220,7 +208,7 @@ public class GameMap : MonoBehaviour
     /// Smoothely move shooter to the correct time.
     /// </summary>
     /// <returns></returns>
-    private IEnumerator LerpObjectToPosition(Transform transform, Vector3 desiredPosition, int distanceTraveled)
+    private IEnumerator LerpObjectToPosition(Transform transform, Vector3 desiredPosition, int distanceTraveled, System.Action callback)
     {
         float lerpTime = distanceTraveled * ShooterLerpTimePerTimeTraveled;
         Vector3 startPosition = transform.position;
@@ -234,6 +222,11 @@ public class GameMap : MonoBehaviour
             transform.position = Vector3.Lerp(startPosition, desiredPosition, ratio);
 
             yield return new WaitForEndOfFrame();
+        }
+
+        if(callback != null)
+        {
+            callback();
         }
     }
 }

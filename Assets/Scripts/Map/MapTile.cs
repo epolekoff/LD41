@@ -12,7 +12,7 @@ public enum HighlightState
 public class MapTile : MonoBehaviour
 {
     // All tiles are squares, and the same size.
-    public static float Width = 1f;
+    public static float Width = 2f;
 
     // Tiles have modifiable height.
     // They default to 1, but you can change it.
@@ -32,13 +32,29 @@ public class MapTile : MonoBehaviour
 
 	// Use this for initialization
 	void Start () {
-		
+        RegisterMapTile(GameManager.Instance.Map, Position, this);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
+
+    /// <summary>
+    /// When creating the map tiles, hook them up to be reverse engineered.
+    /// </summary>
+    private void RegisterMapTile(GameMap gameMap, Vector2 position, MapTile tile)
+    {
+        // If the tile was already registered, remove it.
+        if (gameMap.MapTiles.ContainsKey(position))
+        {
+            GameObject.Destroy(gameMap.MapTiles[position]);
+            gameMap.MapTiles.Remove(position);
+        }
+
+        // Register the new tile.
+        gameMap.MapTiles.Add(position, tile);
+    }
 
     /// <summary>
     /// Show the highlight, or hide it.

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum PlayerState
 {
+    OtherPlayerTurn,
     SelectingUnit,
     ViewingEnemy,
     MovingUnit,
@@ -38,6 +39,14 @@ public class Player
 	}
 
     /// <summary>
+    /// Tell me it's my turn now.
+    /// </summary>
+    public void SetMyTurn()
+    {
+        m_currentState = PlayerState.SelectingUnit;
+    }
+
+    /// <summary>
     /// Handle clicking on tiles.
     /// </summary>
     private void HandleInput()
@@ -58,6 +67,9 @@ public class Player
                 var mapTile = hit.transform.parent.GetComponent<MapTile>();
                 ClickOnTile(mapTile);
             }
+
+            // Handle clicking to shoot
+            FireBullet();
         }
 
         // Space to test camera transitions.
@@ -94,7 +106,7 @@ public class Player
                 ClickOnMoveRange(tile);
                 return;
 
-            case PlayerState.Shooting:
+            default:
                 return;
         }
     }
@@ -149,14 +161,52 @@ public class Player
         // If clicking a blue highlight, move there.
         if (tile.HighlightState == HighlightState.Friendly && m_selectedShooter != null)
         {
-            map.MoveObjectToTile(m_selectedShooter, (int)tile.Position.x, (int)tile.Position.y);
-            m_currentState = PlayerState.SelectingUnit; // Shooting
-            ClickOffTile();
+            Shooter selectedShooter = m_selectedShooter;
+            map.MoveObjectToTile(m_selectedShooter, (int)tile.Position.x, (int)tile.Position.y, false, () => 
+            {
+                GameManager.Instance.GameCamera.TransitionToFirstPerson(selectedShooter);
+                m_selectedShooter.HideVisual();
+                m_currentState = PlayerState.Shooting;
+            });
+
+            // Clear all highlights
+            GameManager.Instance.Map.ClearHighlightedTiles();
         }
         else
         {
             ClickOffTile();
             m_currentState = PlayerState.SelectingUnit;
         }
+    }
+
+    /// <summary>
+    /// Fire a bullet, then return to
+    /// </summary>
+    private void FireBullet()
+    {
+        // Can only fire in the shooting state.
+        if(m_currentState != PlayerState.Shooting)
+        {
+            return;
+        }
+
+        // Fire 1 bullet
+        m_selectedShooter.Fire(OnBulletDestroyed);
+    }
+
+    /// <summary>
+    /// When the bullet has been destroyed, go to the next player's turn and return to 3rd person.
+    /// </summary>
+    private void OnBulletDestroyed()
+    {
+        // Transition back to 3rd person (should be after bullet is destroyed
+        GameManager.Instance.GameCamera.TransitionToThirdPerson();
+
+        // Show the shooter again.
+        m_selectedShooter.ShowVisual();
+
+        // Go to the other player's turn
+        m_currentState = PlayerState.OtherPlayerTurn;
+        GameManager.Instance.SetNextPlayerTurn();
     }
 }

@@ -12,13 +12,13 @@ public enum CameraMode
 public class GameCamera : MonoBehaviour, IStateMachineEntity
 {
 
-    public static float CameraPanSpeed = 6f;
+    public static float CameraPanSpeed = 15f;
     public static float CameraRotateIncrement = 90f;
     public static float CameraLerpTime = 0.5f;
     public static float CameraZoomSpeed = 1f;
 
     private const float CameraSizeMin = 4;
-    private const float CameraSizeMax = 12;
+    private const float CameraSizeMax = 24;
 
     private const float FOV = 60f;
     private const float zNear = 0.3f;

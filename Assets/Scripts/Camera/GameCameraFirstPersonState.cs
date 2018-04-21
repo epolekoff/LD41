@@ -52,12 +52,6 @@ public class GameCameraFirstPersonState : AbsState
         RotateCamera(camera);
 
         // Lean the camera.
-
-        // Fire?
-        if(Input.GetMouseButtonDown(0))
-        {
-            m_shooter.Fire();
-        }
     }
 
     /// <summary>

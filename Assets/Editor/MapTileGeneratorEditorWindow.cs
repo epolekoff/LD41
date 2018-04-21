@@ -40,10 +40,10 @@ public class MapTileGeneratorEditorWindow : EditorWindow
                     MapTile mapTile = mapTileObject.GetComponent<MapTile>();
                     mapTile.transform.name = string.Format("MapTile({0},{1})", x, y);
                     mapTile.Position = new Vector2(x, y);
-
-                    gameMap.RegisterMapTile(mapTile.Position, mapTile);
                 }
             }
         }
     }
+
+    
 }

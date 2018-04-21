@@ -8,9 +8,10 @@ public class ShooterCanvas : MonoBehaviour
 
     public Image HealthbarFill;
     public Image HealthbarBackground;
+    public Image HealthbarFillBackground;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -27,6 +28,7 @@ public class ShooterCanvas : MonoBehaviour
     {
         HealthbarBackground.gameObject.SetActive(show);
         HealthbarFill.gameObject.SetActive(show);
+        HealthbarFillBackground.gameObject.SetActive(show);
     }
 
     /// <summary>
@@ -38,6 +40,10 @@ public class ShooterCanvas : MonoBehaviour
         if(ratio == 1)
         {
             ShowHealthBar(false);
+        }
+        else
+        {
+            ShowHealthBar(true);
         }
 
         HealthbarFill.fillAmount = ratio;
