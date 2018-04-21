@@ -8,6 +8,8 @@ public class Shooter : MonoBehaviour {
     public GameObject Visual;
     public Transform CameraSocket;
     public ShooterCanvas ShooterCanvas;
+    public GameObject BulletPrefab;
+    public Transform BulletSpawnPoint;
 
     public Vector2 TilePosition;
 
@@ -39,6 +41,15 @@ public class Shooter : MonoBehaviour {
         {
             renderer.material = teamColor;
         }
+    }
+
+    /// <summary>
+    /// Fire a bullet.
+    /// </summary>
+    public void Fire()
+    {
+        var bulletObject = GameObject.Instantiate(BulletPrefab, BulletSpawnPoint.transform.position, Quaternion.identity) as GameObject;
+        bulletObject.GetComponent<Rigidbody>().AddForce(CameraSocket.forward * 1000f);
     }
 
     /// <summary>

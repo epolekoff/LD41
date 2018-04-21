@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class GameCameraFirstPersonState : AbsState
 {
-    public float sensitivityX = 15F;
-    public float sensitivityY = 15F;
+    public float sensitivityX = 8F;
+    public float sensitivityY = 8F;
 
     public float minimumX = -360F;
     public float maximumX = 360F;
@@ -31,6 +31,10 @@ public class GameCameraFirstPersonState : AbsState
     public override void Update(IStateMachineEntity entity)
     {
         HandleInput((GameCamera)entity);
+
+        // Keep the camera socket on the shooter synced with the camera, 
+        // so this shooter's last view position is saved between modes.
+        m_shooter.CameraSocket.transform.rotation = ((GameCamera)entity).transform.rotation;
     }
 
     /// <summary>
@@ -48,6 +52,12 @@ public class GameCameraFirstPersonState : AbsState
         RotateCamera(camera);
 
         // Lean the camera.
+
+        // Fire?
+        if(Input.GetMouseButtonDown(0))
+        {
+            m_shooter.Fire();
+        }
     }
 
     /// <summary>
@@ -56,9 +66,6 @@ public class GameCameraFirstPersonState : AbsState
     /// <param name="entity"></param>
     public override void Exit(IStateMachineEntity entity)
     {
-        // Keep the camera socket on the shooter synced with the camera, 
-        // so this shooter's last view position is saved between modes.
-        m_shooter.CameraSocket.transform.rotation = ((GameCamera)entity).transform.rotation;
         m_shooter = null;
     }
 
