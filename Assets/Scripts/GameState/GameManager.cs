@@ -27,6 +27,8 @@ public class GameManager : Singleton<GameManager>, IStateMachineEntity
     private FiniteStateMachine m_stateMachine;
     public FiniteStateMachine GetStateMachine(int number = 0) { return m_stateMachine; }
 
+    public Player CurrentPlayer { get { return m_currentPlayer; } }
+
     // Use this for initialization
     void Start ()
     {

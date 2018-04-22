@@ -24,6 +24,9 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
     private const float zNear = 0.3f;
     private const float zFar = 1000f;
 
+    private const float CameraLingerTime = 2f;
+    private const float MatrixLerpEase = 3f;
+
     private FiniteStateMachine m_stateMachine;
     private GameCameraFirstPersonState m_firstPersonState;
     private GameCameraThirdPersonState m_thirdPersonState;
@@ -36,6 +39,8 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
     private Quaternion m_lastOrthoRotation;
     private Vector3 m_lastOrthoPosition;
     private Matrix4x4 m_startingOrthoProjectionMatrix;
+    private Matrix4x4 m_perspective;
+    private float m_aspectRatio;
 
     public FiniteStateMachine GetStateMachine(int number = 0){ return m_stateMachine; }
 
@@ -46,6 +51,11 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
     /// </summary>
     void Start()
     {
+        m_aspectRatio = (float)Screen.width / (float)Screen.height;
+        //ortho = Matrix4x4.Ortho(-orthographicSize * aspect, orthographicSize * aspect, -orthographicSize, orthographicSize, near, far);
+        m_perspective = Matrix4x4.Perspective(FOV, m_aspectRatio, zNear, zFar);
+        
+
         // Ortho hack. Math is hard.
         m_startingOrthoProjectionMatrix = GetComponent<Camera>().projectionMatrix;
 
@@ -83,7 +93,8 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
         m_desiredRotation = shooter.CameraSocket.rotation;
 
         // Toggle it to Perspective
-        GetComponent<Camera>().projectionMatrix = Matrix4x4.Perspective(FOV, 16f/9f, zNear, zFar);
+        GetComponent<MatrixBlender>().BlendToMatrix(m_perspective, CameraLerpTime, MatrixLerpEase, false);
+        //GetComponent<Camera>().projectionMatrix = Matrix4x4.Perspective(FOV, 16f/9f, zNear, zFar);
 
         // Hide the 3rd person canvas.
         GameManager.Instance.GameCanvas.ThirdPersonTutorial.gameObject.SetActive(false);
@@ -100,6 +111,30 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
             // Show the First Person Canvas.
             GameManager.Instance.GameCanvas.FirstPersonCanvas.gameObject.SetActive(true);
         }));
+    }
+
+    public void LingerBeforeTransitionToThirdPerson(System.Action callback)
+    {
+        // Already in this state, return.
+        if (m_currentMode == CameraMode.ThirdPerson)
+        {
+            return;
+        }
+
+        m_stateMachine.ChangeState(new GameCameraLingerState());
+
+        StartCoroutine(TransitionToThirdPersonAfterDelay(callback));
+    }
+
+    private IEnumerator TransitionToThirdPersonAfterDelay(System.Action callback)
+    {
+        yield return new WaitForSeconds(CameraLingerTime);
+        TransitionToThirdPerson();
+
+        if(callback != null)
+        {
+            callback();
+        }
     }
 
     /// <summary>
@@ -124,13 +159,12 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
         // Hide the First Person Canvas.
         GameManager.Instance.GameCanvas.FirstPersonCanvas.gameObject.SetActive(false);
 
+        // Toggle it to Orthographic
+        GetComponent<MatrixBlender>().BlendToMatrix(m_startingOrthoProjectionMatrix, CameraLerpTime, MatrixLerpEase, true);
+
         // Move the camera
         StartCoroutine(LerpCameraToRotation(() =>
         {
-            // Toggle it to Orthographic
-            GetComponent<Camera>().projectionMatrix = m_startingOrthoProjectionMatrix;
-            GetComponent<Camera>().ResetProjectionMatrix();
-
             // Show the 3rd person canvas.
             if(GameManager.Instance.TurnCount<2)
             {
@@ -152,7 +186,7 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
     /// </summary>
     public void FollowGrenade(Grenade grenade)
     {
-        m_stateMachine.ChangeState(new GameCameraFollowGrenadeState(grenade));
+        m_stateMachine.ChangeState(new GameCameraFollowGrenadeState(grenade, GameManager.Instance.CurrentPlayer.Number));
     }
 
     /// <summary>

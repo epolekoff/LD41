@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public GameObject BulletHitEffect;
+    public GameObject BulletMissEffect;
+
     private const float GravityForce = 2f;
     private const float MaxBulletLifetime = 5f;
     private float m_lifeTimer = MaxBulletLifetime;
@@ -26,7 +29,7 @@ public class Bullet : MonoBehaviour
         m_lifeTimer -= Time.deltaTime;
         if (m_lifeTimer <= 0)
         {
-            DestroyMe();
+            DestroyMe(false);
         }
 
         GetComponent<Rigidbody>().AddForce(-Vector3.up * GravityForce);
@@ -47,26 +50,37 @@ public class Bullet : MonoBehaviour
     /// <param name="col"></param>
     public void OnCollisionEnter(Collision col)
     {
-        // Destroy the bullet
-        DestroyMe();
-
         // If it hit a shooter, deal damage to them.
         BodyPart bodyPart = col.gameObject.GetComponentInParent<BodyPart>();
         if(bodyPart == null)
         {
+            // Destroy the bullet
+            DestroyMe(false);
             return;
         }
-
         bodyPart.OnHit(col.contacts[0]);
+
+        // Destroy the bullet
+        DestroyMe(true);
     }
 
-    private void DestroyMe()
+    private void DestroyMe(bool hitPlayer)
     {
         GameCamera camera = GetComponentInChildren<GameCamera>();
         if (camera != null)
         {
             camera.transform.parent = null;
         }
+
+        if(!hitPlayer)
+        {
+            GameObject.Instantiate(BulletMissEffect, transform.position, Quaternion.identity);
+        }
+        else
+        {
+            GameObject.Instantiate(BulletHitEffect, transform.position, Quaternion.identity);
+        }
+
         GameObject.Destroy(gameObject);
     }
 

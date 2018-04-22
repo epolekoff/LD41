@@ -226,14 +226,15 @@ public class Player
     private void OnBulletDestroyed()
     {
         // Transition back to 3rd person (should be after bullet is destroyed
-        GameManager.Instance.GameCamera.TransitionToThirdPerson();
+        GameManager.Instance.GameCamera.LingerBeforeTransitionToThirdPerson( () =>
+        {
+            // Go to the other player's turn
+            m_currentState = PlayerState.OtherPlayerTurn;
+            GameManager.Instance.SetNextPlayerTurn();
+        });
 
         // Show the shooter again.
         m_selectedShooter.ShowVisual();
-
-        // Go to the other player's turn
-        m_currentState = PlayerState.OtherPlayerTurn;
-        GameManager.Instance.SetNextPlayerTurn();
     }
 
     private void ThrowGrenade()
