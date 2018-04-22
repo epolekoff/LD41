@@ -17,6 +17,7 @@ public class Shooter : MonoBehaviour {
     public int TeamId { get; set; }
 
     public Material TeamColor { get; set; }
+    public bool IsDead { get; set; }
 
     private const float BulletHitForce = 200f;
     private const float BulletFireForce = 1000f;
@@ -56,7 +57,10 @@ public class Shooter : MonoBehaviour {
     /// </summary>
     public void Fire(System.Action onDestroyed)
     {
-        var bulletObject = GameObject.Instantiate(BulletPrefab, BulletSpawnPoint.transform.position, Quaternion.identity) as GameObject;
+        var bulletObject = GameObject.Instantiate(
+            BulletPrefab, 
+            BulletSpawnPoint.transform.position, 
+            Quaternion.LookRotation(-CameraSocket.right, Vector3.up)) as GameObject;
         bulletObject.GetComponent<Rigidbody>().AddForce(CameraSocket.forward * BulletFireForce);
         bulletObject.GetComponent<Bullet>().SetTeamColor(TeamColor);
         bulletObject.GetComponent<Bullet>().OnDestroyed += onDestroyed;
@@ -113,6 +117,12 @@ public class Shooter : MonoBehaviour {
     /// </summary>
     private void Die(Vector3 point, Vector3 direction)
     {
+        if(IsDead)
+        {
+            return;
+        }
+        IsDead = true;
+
         // Knock the person over.
         Rigidbody body = gameObject.AddComponent<Rigidbody>();
         body.constraints = RigidbodyConstraints.None;
@@ -120,5 +130,8 @@ public class Shooter : MonoBehaviour {
 
         // Remove the object from the map tile system.
         GameManager.Instance.Map.RemoveObjectFromTiles(this);
+
+        // Tell my player to check if I lost
+        GameManager.Instance.Players[TeamId].CheckIsLoser();
     }
 }

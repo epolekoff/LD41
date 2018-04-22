@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 1d84de071b8a7e34f995f899ab50ae1c
+timeCreated: 1524386044
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Argos
+  fontNames:
+  - Argos
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

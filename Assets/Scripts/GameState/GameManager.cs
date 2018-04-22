@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : Singleton<GameManager> {
+public class GameManager : Singleton<GameManager>, IStateMachineEntity
+{
 
     // Consts
     public const int TeamCount = 2;
@@ -16,12 +18,17 @@ public class GameManager : Singleton<GameManager> {
     // Public Data
     public List<Shooter>[] Teams = new List<Shooter>[TeamCount];
     public List<Player> Players = new List<Player>();
+    public bool IsGameActive { get; set; }
+    public int TurnCount { get; set; }
 
     // Private data
     private Player m_currentPlayer;
+    private FiniteStateMachine m_stateMachine;
+    public FiniteStateMachine GetStateMachine(int number = 0) { return m_stateMachine; }
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start ()
+    {
 
         // Create the players
         CreatePlayers();
@@ -31,6 +38,16 @@ public class GameManager : Singleton<GameManager> {
 
         // Position the teams on the grid.
         PositionTeams();
+
+        // State machine stuff.
+        m_stateMachine = new FiniteStateMachine(new GameState(), this);
+        IsGameActive = true;
+
+        // Turn counter
+        TurnCount = 0;
+
+        // Show turn graphic for the player
+        GameCanvas.ShowNextTurnGraphic(m_currentPlayer);
     }
 	
 	// Update is called once per frame
@@ -38,17 +55,39 @@ public class GameManager : Singleton<GameManager> {
     {
         // Update the current player each frame.
         m_currentPlayer.Update();
-	}
+        m_stateMachine.Update();
+
+        // Quit the game.
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
+        if (Input.GetKeyDown(KeyCode.BackQuote))
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Game");
+        }
+    }
 
     /// <summary>
     /// Tell the next player that they are up.
     /// </summary>
     public void SetNextPlayerTurn()
     {
+        if(!IsGameActive)
+        {
+            return;
+        }
+
         int currentPlayerNumber = m_currentPlayer.Number;
         int nextPlayerNumber = (int)Mathf.Repeat(++currentPlayerNumber, 2);
         m_currentPlayer = Players[nextPlayerNumber];
         m_currentPlayer.SetMyTurn();
+
+        // Show a graphic.
+        GameCanvas.ShowNextTurnGraphic(m_currentPlayer);
+
+        TurnCount++;
     }
 
     /// <summary>
@@ -74,6 +113,7 @@ public class GameManager : Singleton<GameManager> {
         for (int i = 0; i < TeamCount; i++)
         {
             Teams[i] = ShooterFactory.CreateShooterTeam(i, TeamData[i]);
+            Players[i].Team = Teams[i];
         }
     }
 
@@ -96,5 +136,12 @@ public class GameManager : Singleton<GameManager> {
         }
     }
 
-    
+    /// <summary>
+    /// A player lost, the game is over.
+    /// </summary>
+    public void PlayerLost(int number)
+    {
+        m_stateMachine.ChangeState(new VictoryState());
+        IsGameActive = false;
+    }
 }

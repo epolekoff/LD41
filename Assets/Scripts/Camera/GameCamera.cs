@@ -85,6 +85,9 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
         // Toggle it to Perspective
         GetComponent<Camera>().projectionMatrix = Matrix4x4.Perspective(FOV, 16f/9f, zNear, zFar);
 
+        // Hide the 3rd person canvas.
+        GameManager.Instance.GameCanvas.ThirdPersonTutorial.gameObject.SetActive(false);
+
         // Change the state machine state
         m_currentMode = CameraMode.FirstPerson;
         m_firstPersonState.SetShooter(shooter);
@@ -126,6 +129,12 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
             // Toggle it to Orthographic
             GetComponent<Camera>().projectionMatrix = m_startingOrthoProjectionMatrix;
             GetComponent<Camera>().ResetProjectionMatrix();
+
+            // Show the 3rd person canvas.
+            if(GameManager.Instance.TurnCount<2)
+            {
+                GameManager.Instance.GameCanvas.ThirdPersonTutorial.gameObject.SetActive(true);
+            }
         }));
     }
 

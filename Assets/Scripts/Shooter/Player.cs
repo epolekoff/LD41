@@ -19,8 +19,12 @@ public class Player
     /// </summary>
     public int Number { get; set; }
 
+    public List<Shooter> Team { get; set; }
+
     private PlayerState m_currentState = PlayerState.SelectingUnit;
     private Shooter m_selectedShooter;
+
+    public string TeamColorName { get { return Number == 0 ? "Red" : "Blue"; } }
 
     private float m_turnTimer = 0f;
     private const float MaxTurnTimer = 5f;
@@ -102,20 +106,6 @@ public class Player
         if(Input.GetMouseButtonDown(1))
         {
             ThrowGrenade();
-        }
-
-        // Space to test camera transitions.
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            // For testing, focust on the first player on the team.
-            GameManager.Instance.GameCamera.TransitionToFirstPerson(GameManager.Instance.Teams[Number][0]);
-        }
-
-        // ESC to test camera transitions.
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            // For testing, focust on the first player on the team.
-            GameManager.Instance.GameCamera.TransitionToThirdPerson();
         }
     }
 
@@ -262,5 +252,21 @@ public class Player
 
         // Set the state to watching the bullet
         m_currentState = PlayerState.WatchingBullet;
+    }
+
+    /// <summary>
+    /// Check if I lost.
+    /// </summary>
+    public void CheckIsLoser()
+    {
+        foreach(Shooter shooter in Team)
+        {
+            if(!shooter.IsDead)
+            {
+                return;
+            }
+        }
+
+        GameManager.Instance.PlayerLost(Number);
     }
 }
