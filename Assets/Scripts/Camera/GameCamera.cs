@@ -139,6 +139,22 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
     }
 
     /// <summary>
+    /// Keep the camera slightly behind the bullet as it travels.
+    /// </summary>
+    public void FollowBullet(Bullet bullet)
+    {
+        m_stateMachine.ChangeState(new GameCameraFollowBulletState(bullet));
+    }
+
+    /// <summary>
+    /// Keep close behind the grenade.
+    /// </summary>
+    public void FollowGrenade(Grenade grenade)
+    {
+        m_stateMachine.ChangeState(new GameCameraFollowGrenadeState(grenade));
+    }
+
+    /// <summary>
     /// Move the camera across the screen based on movement speed.
     /// </summary>
     public void PanCamera(Vector2 amount)

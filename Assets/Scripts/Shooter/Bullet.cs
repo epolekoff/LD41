@@ -6,6 +6,7 @@ public class Bullet : MonoBehaviour
 {
     private const float GravityForce = 2f;
     private const float MaxBulletLifetime = 5f;
+    private float m_lifeTimer = MaxBulletLifetime;
 
     public event System.Action OnDestroyed;
 
@@ -15,7 +16,6 @@ public class Bullet : MonoBehaviour
     /// </summary>
 	void Start ()
     {
-        GameObject.Destroy(gameObject, MaxBulletLifetime);
 	}
 	
 	/// <summary>
@@ -23,6 +23,12 @@ public class Bullet : MonoBehaviour
     /// </summary>
 	void Update ()
     {
+        m_lifeTimer -= Time.deltaTime;
+        if (m_lifeTimer <= 0)
+        {
+            DestroyMe();
+        }
+
         GetComponent<Rigidbody>().AddForce(-Vector3.up * GravityForce);
 	}
 
@@ -42,7 +48,7 @@ public class Bullet : MonoBehaviour
     public void OnCollisionEnter(Collision col)
     {
         // Destroy the bullet
-        Destroy(gameObject);
+        DestroyMe();
 
         // If it hit a shooter, deal damage to them.
         BodyPart bodyPart = col.gameObject.GetComponentInParent<BodyPart>();
@@ -52,6 +58,16 @@ public class Bullet : MonoBehaviour
         }
 
         bodyPart.OnHit(col.contacts[0]);
+    }
+
+    private void DestroyMe()
+    {
+        GameCamera camera = GetComponentInChildren<GameCamera>();
+        if (camera != null)
+        {
+            camera.transform.parent = null;
+        }
+        GameObject.Destroy(gameObject);
     }
 
     /// <summary>

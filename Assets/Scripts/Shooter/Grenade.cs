@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Grenade : MonoBehaviour
 {
+    public GameObject ExplosionEffect;
+
     private const float GravityForce = 10f;
     private const float MaxGrenadeLifetime = 4f;
     private const int GrenadeDamage = 1;
@@ -43,8 +45,17 @@ public class Grenade : MonoBehaviour
     /// </summary>
     private void Explode()
     {
+        GameCamera camera = GetComponentInChildren<GameCamera>();
+        if(camera != null)
+        {
+            camera.transform.parent = null;
+        }
+
         // Destroy.
         Destroy(gameObject);
+
+        // Create an effect.
+        GameObject.Instantiate(ExplosionEffect, transform.position, Quaternion.identity);
 
         // Hit things.
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, ExplosionRadiusValue);

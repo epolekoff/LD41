@@ -64,6 +64,9 @@ public class Shooter : MonoBehaviour {
         bulletObject.GetComponent<Rigidbody>().AddForce(CameraSocket.forward * BulletFireForce);
         bulletObject.GetComponent<Bullet>().SetTeamColor(TeamColor);
         bulletObject.GetComponent<Bullet>().OnDestroyed += onDestroyed;
+
+        // Make the camera follow the bullet.
+        GameManager.Instance.GameCamera.FollowBullet(bulletObject.GetComponent<Bullet>());
     }
 
     /// <summary>
@@ -75,6 +78,9 @@ public class Shooter : MonoBehaviour {
         grenadeObject.GetComponent<Rigidbody>().AddForce(CameraSocket.forward * GrenadeThrowForce);
         grenadeObject.GetComponent<Grenade>().SetTeamColor(TeamColor);
         grenadeObject.GetComponent<Grenade>().OnDestroyed += onDestroyed;
+
+        // Make the camera follow the grenade.
+        GameManager.Instance.GameCamera.FollowGrenade(grenadeObject.GetComponent<Grenade>());
     }
 
     /// <summary>

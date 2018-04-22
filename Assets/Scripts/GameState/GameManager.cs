@@ -14,6 +14,7 @@ public class GameManager : Singleton<GameManager>, IStateMachineEntity
     public GameCamera GameCamera;
     public GameMap Map;
     public GameCanvas GameCanvas;
+    public Transform PlayerStartingLookPoint;
 
     // Public Data
     public List<Shooter>[] Teams = new List<Shooter>[TeamCount];
@@ -128,10 +129,14 @@ public class GameManager : Singleton<GameManager>, IStateMachineEntity
             for(int i = 0; i < Teams[t].Count; i++)
             {
                 var team = Teams[t];
+                Shooter shooter = team[i];
                 Vector2 tilePosition = TeamData[t].StartingPositions[i];
 
                 // Record the player on that tile.
-                Map.MoveObjectToTile(team[i], (int)tilePosition.x, (int)tilePosition.y, firstTimeSetup: true);
+                Map.MoveObjectToTile(shooter, (int)tilePosition.x, (int)tilePosition.y, firstTimeSetup: true);
+
+                // Make the shooter look at the starting point.
+                shooter.CameraSocket.LookAt(PlayerStartingLookPoint);
             }
         }
     }
