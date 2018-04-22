@@ -37,7 +37,7 @@ public class ShooterCanvas : MonoBehaviour
     public void SetHealth(float ratio)
     {
         // If Health is at full, hide the health bar.
-        if(ratio == 1)
+        if(ratio == 1 || ratio <= 0.1)
         {
             ShowHealthBar(false);
         }

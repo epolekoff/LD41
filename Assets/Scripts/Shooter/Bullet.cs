@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    private const float GravityForce = 4f;
+    private const float GravityForce = 2f;
     private const float MaxBulletLifetime = 5f;
 
     public event System.Action OnDestroyed;
@@ -31,7 +31,8 @@ public class Bullet : MonoBehaviour
     /// </summary>
     public void SetTeamColor(Material material)
     {
-        GetComponent<Renderer>().material = material;
+        GetComponentInChildren<Renderer>().material = material;
+        GetComponentInChildren<TrailRenderer>().material.color = material.color;
     }
 
     /// <summary>
@@ -50,7 +51,7 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        bodyPart.OnHit();
+        bodyPart.OnHit(col.contacts[0]);
     }
 
     /// <summary>

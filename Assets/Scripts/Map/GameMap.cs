@@ -80,6 +80,15 @@ public class GameMap : MonoBehaviour
     }
 
     /// <summary>
+    /// Remove a shooter from a tile.
+    /// </summary>
+    /// <param name="shooter"></param>
+    public void RemoveObjectFromTiles(Shooter shooter)
+    {
+        ObjectsOnTiles[(int)shooter.TilePosition.x, (int)shooter.TilePosition.y] = null;
+    }
+
+    /// <summary>
     /// Get the neighbors of this tile.
     /// </summary>
     public List<Vector2> GetValidNeighbors(Vector2 tilePosition)

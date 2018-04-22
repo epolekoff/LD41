@@ -10,12 +10,17 @@ public class Shooter : MonoBehaviour {
     public ShooterCanvas ShooterCanvas;
     public GameObject BulletPrefab;
     public Transform BulletSpawnPoint;
+    public GameObject GrenadePrefab;
 
     public Vector2 TilePosition;
 
     public int TeamId { get; set; }
 
-    public Material TeamColor;
+    public Material TeamColor { get; set; }
+
+    private const float BulletHitForce = 200f;
+    private const float BulletFireForce = 1000f;
+    private const float GrenadeThrowForce = 800f;
 
     private int m_currentHealth;
 
@@ -52,9 +57,20 @@ public class Shooter : MonoBehaviour {
     public void Fire(System.Action onDestroyed)
     {
         var bulletObject = GameObject.Instantiate(BulletPrefab, BulletSpawnPoint.transform.position, Quaternion.identity) as GameObject;
-        bulletObject.GetComponent<Rigidbody>().AddForce(CameraSocket.forward * 1000f);
+        bulletObject.GetComponent<Rigidbody>().AddForce(CameraSocket.forward * BulletFireForce);
         bulletObject.GetComponent<Bullet>().SetTeamColor(TeamColor);
         bulletObject.GetComponent<Bullet>().OnDestroyed += onDestroyed;
+    }
+
+    /// <summary>
+    /// Throw a grenade.
+    /// </summary>
+    public void ThrowGrenade(System.Action onDestroyed)
+    {
+        var grenadeObject = GameObject.Instantiate(GrenadePrefab, BulletSpawnPoint.transform.position, Quaternion.identity) as GameObject;
+        grenadeObject.GetComponent<Rigidbody>().AddForce(CameraSocket.forward * GrenadeThrowForce);
+        grenadeObject.GetComponent<Grenade>().SetTeamColor(TeamColor);
+        grenadeObject.GetComponent<Grenade>().OnDestroyed += onDestroyed;
     }
 
     /// <summary>
@@ -73,25 +89,36 @@ public class Shooter : MonoBehaviour {
     /// <summary>
     /// Take some amount of damage.
     /// </summary>
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, Vector3 point, Vector3 direction)
     {
         m_currentHealth -= damage;
         if(m_currentHealth <= 0)
         {
-            Die();
+            Die(transform.position, direction);
         }
 
         ShooterCanvas.SetHealth((float)((float)m_currentHealth / (float)Data.Health));
+    }
+    public void TakeDamage(int damage, Vector3 direction)
+    {
+        TakeDamage(damage, transform.position, direction);
+    }
+    public void TakeDamage(int damage, ContactPoint hitPoint)
+    {
+        TakeDamage(damage, hitPoint.point, -hitPoint.normal * BulletHitForce);
     }
 
     /// <summary>
     /// When this player dies, do some stuff.
     /// </summary>
-    private void Die()
+    private void Die(Vector3 point, Vector3 direction)
     {
-        // Destroy the game object.
-        //GameObject.Destroy(this.gameObject);
+        // Knock the person over.
+        Rigidbody body = gameObject.AddComponent<Rigidbody>();
+        body.constraints = RigidbodyConstraints.None;
+        body.AddForceAtPosition(direction, point);
 
         // Remove the object from the map tile system.
+        GameManager.Instance.Map.RemoveObjectFromTiles(this);
     }
 }

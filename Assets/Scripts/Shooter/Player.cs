@@ -99,6 +99,11 @@ public class Player
             FireBullet();
         }
 
+        if(Input.GetMouseButtonDown(1))
+        {
+            ThrowGrenade();
+        }
+
         // Space to test camera transitions.
         if(Input.GetKeyDown(KeyCode.Space))
         {
@@ -239,5 +244,23 @@ public class Player
         // Go to the other player's turn
         m_currentState = PlayerState.OtherPlayerTurn;
         GameManager.Instance.SetNextPlayerTurn();
+    }
+
+    private void ThrowGrenade()
+    {
+        // Can only fire in the shooting state.
+        if (m_currentState != PlayerState.Shooting)
+        {
+            return;
+        }
+
+        // Allow a player to blow himself up.
+        m_selectedShooter.ShowVisual();
+
+        // Throw 1 grenade
+        m_selectedShooter.ThrowGrenade(OnBulletDestroyed);
+
+        // Set the state to watching the bullet
+        m_currentState = PlayerState.WatchingBullet;
     }
 }
