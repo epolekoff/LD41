@@ -36,7 +36,7 @@ public class MapTile : MonoBehaviour
     public Obstacle Obstacle;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         RegisterMapTile(GameManager.Instance.Map, Position, this);
 	}
 	
