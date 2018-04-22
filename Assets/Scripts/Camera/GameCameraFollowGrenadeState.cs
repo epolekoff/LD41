@@ -30,8 +30,7 @@ public class GameCameraFollowGrenadeState : AbsState
         //Vector3 fromCameraToGrenade = (m_grenade.transform.position - camera.transform.position).normalized;
 
         Vector3 targetPosition = m_grenade.transform.position + new Vector3(FollowDistanceX, FollowDistanceY, FollowDistanceZ);
-        if(Vector3.Distance(camera.transform.position, targetPosition) > 1)
-            camera.transform.position += (targetPosition - camera.transform.position).normalized * FollowSpeed;
+        camera.transform.position = Vector3.Lerp(camera.transform.position, targetPosition, 10 * Time.deltaTime);//(targetPosition - camera.transform.position).normalized * FollowSpeed;
         //camera.transform.SetParent(m_grenade.transform, true);
         camera.transform.LookAt(m_grenade.transform);
     }

@@ -90,6 +90,7 @@ public class GameCamera : MonoBehaviour, IStateMachineEntity
 
         // Change the state machine state
         m_currentMode = CameraMode.FirstPerson;
+        m_firstPersonState = new GameCameraFirstPersonState();
         m_firstPersonState.SetShooter(shooter);
         m_stateMachine.ChangeState(m_firstPersonState);
 

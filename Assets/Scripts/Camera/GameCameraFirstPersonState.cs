@@ -54,6 +54,11 @@ public class GameCameraFirstPersonState : AbsState
         // Lean the camera.
     }
 
+    public override void Enter(IStateMachineEntity entity)
+    {
+        rotationY = 0;
+    }
+
     /// <summary>
     /// When exiting first person mode.
     /// </summary>
