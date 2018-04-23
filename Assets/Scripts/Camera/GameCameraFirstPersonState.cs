@@ -7,6 +7,9 @@ public class GameCameraFirstPersonState : AbsState
     public float sensitivityX = 3F;
     public float sensitivityY = 3F;
 
+    public float webGL_sensitivityX = 1f;
+    public float webGL_sensitivityY = 1f;
+
     public float minimumX = -360F;
     public float maximumX = 360F;
 
@@ -57,6 +60,11 @@ public class GameCameraFirstPersonState : AbsState
     public override void Enter(IStateMachineEntity entity)
     {
         rotationY = 0;
+
+#if UNITY_WEBGL
+        sensitivityX = webGL_sensitivityX;
+        sensitivityY = webGL_sensitivityY;
+#endif
     }
 
     /// <summary>
