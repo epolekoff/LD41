@@ -6,6 +6,9 @@ public class Grenade : MonoBehaviour
 {
     public GameObject ExplosionEffect;
 
+    public AudioClip BounceSound;
+    public AudioClip ExplodeSound;
+
     private const float GravityForce = 10f;
     private const float MaxGrenadeLifetime = 4f;
     private const int GrenadeDamage = 1;
@@ -51,6 +54,9 @@ public class Grenade : MonoBehaviour
             camera.transform.parent = null;
         }
 
+        // Play sound
+        AudioManager.Instance.PlaySound(ExplodeSound);
+
         // Destroy.
         Destroy(gameObject);
 
@@ -87,6 +93,14 @@ public class Grenade : MonoBehaviour
 
             i++;
         }
+    }
+
+    /// <summary>
+    /// Play bounce sound.
+    /// </summary>
+    void OnCollisionEnter()
+    {
+        AudioManager.Instance.PlaySound(BounceSound);
     }
 
     /// <summary>

@@ -12,6 +12,9 @@ public class Shooter : MonoBehaviour {
     public Transform BulletSpawnPoint;
     public GameObject GrenadePrefab;
 
+    public AudioClip ShootSound;
+    public AudioClip DeadSound;
+
     public Vector2 TilePosition;
 
     public int TeamId { get; set; }
@@ -67,6 +70,9 @@ public class Shooter : MonoBehaviour {
 
         // Make the camera follow the bullet.
         GameManager.Instance.GameCamera.FollowBullet(bulletObject.GetComponent<Bullet>());
+
+        // Play sound
+        AudioManager.Instance.PlaySound(ShootSound);
     }
 
     /// <summary>
@@ -128,6 +134,8 @@ public class Shooter : MonoBehaviour {
             return;
         }
         IsDead = true;
+
+        AudioManager.Instance.PlaySound(DeadSound);
 
         // Knock the person over.
         Rigidbody body = gameObject.AddComponent<Rigidbody>();

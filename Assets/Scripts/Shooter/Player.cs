@@ -192,6 +192,9 @@ public class Player
                 m_turnTimer = MaxTurnTimer;
             });
 
+            // Play the move sound.
+            AudioManager.Instance.PlaySound(AudioManager.Instance.MoveSound);
+
             // Clear all highlights
             GameManager.Instance.Map.ClearHighlightedTiles();
         }

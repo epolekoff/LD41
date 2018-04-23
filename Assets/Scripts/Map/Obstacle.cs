@@ -34,11 +34,10 @@ public class Obstacle : MonoBehaviour
                 child.transform.parent = null;
             }
 
+            AudioManager.Instance.PlaySound(AudioManager.Instance.ShatterSound);
+
             // Destroy me
             GameObject.Destroy(gameObject);
         }
-        
-
-        
     }
 }

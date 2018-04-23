@@ -7,8 +7,11 @@ public class Bullet : MonoBehaviour
     public GameObject BulletHitEffect;
     public GameObject BulletMissEffect;
 
+    public AudioClip HitShooter;
+    public AudioClip HitGround;
+
     private const float GravityForce = 2f;
-    private const float MaxBulletLifetime = 5f;
+    private const float MaxBulletLifetime = 4f;
     private float m_lifeTimer = MaxBulletLifetime;
 
     public event System.Action OnDestroyed;
@@ -75,10 +78,12 @@ public class Bullet : MonoBehaviour
         if(!hitPlayer)
         {
             GameObject.Instantiate(BulletMissEffect, transform.position, Quaternion.identity);
+            PlaySound(HitGround);
         }
         else
         {
             GameObject.Instantiate(BulletHitEffect, transform.position, Quaternion.identity);
+            PlaySound(HitShooter);
         }
 
         GameObject.Destroy(gameObject);
@@ -93,5 +98,10 @@ public class Bullet : MonoBehaviour
         {
             OnDestroyed();
         }
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        AudioManager.Instance.PlaySound(clip);
     }
 }
