@@ -9,6 +9,9 @@ public class FirstPersonCanvas : MonoBehaviour {
     public Image Right;
     public Text Timer;
 
+    public GameObject PhoneCanvas;
+    public GameObject PCCanvas;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -16,8 +19,16 @@ public class FirstPersonCanvas : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+
+#if UNITY_ANDROID || UNITY_IOS
+        PhoneCanvas.SetActive(true);
+        PCCanvas.SetActive(false);
+#else
+        PhoneCanvas.SetActive(false);
+        PCCanvas.SetActive(true);
+#endif
+
+    }
 
     /// <summary>
     /// Timer

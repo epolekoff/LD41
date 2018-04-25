@@ -82,8 +82,10 @@ public class Player
     /// </summary>
     private void HandleInput()
     {
+        bool phone = Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer;
+
         // Click to select units/move
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
             // Click on a tile.
             RaycastHit hit;
@@ -100,10 +102,14 @@ public class Player
             }
 
             // Handle clicking to shoot
-            FireBullet();
+            if((!phone || Input.GetTouch(0).position.x < Screen.width / 2))
+            {
+                FireBullet();
+            }
         }
 
-        if(Input.GetMouseButtonDown(1))
+        if(Input.GetMouseButtonDown(1) || 
+            (Input.GetMouseButtonDown(0) && Input.GetTouch(0).position.x > Screen.width / 2))
         {
             ThrowGrenade();
         }

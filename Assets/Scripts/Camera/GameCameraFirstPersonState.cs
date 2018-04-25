@@ -10,6 +10,9 @@ public class GameCameraFirstPersonState : AbsState
     public float webGL_sensitivityX = 1f;
     public float webGL_sensitivityY = 1f;
 
+    public float GyroRotationSpeedX = 2f;
+    public float GyroRotationSpeedY = 2f;
+
     public float minimumX = -360F;
     public float maximumX = 360F;
 
@@ -50,16 +53,22 @@ public class GameCameraFirstPersonState : AbsState
         {
             return;
         }
-
-        // Rotate the camera.
+#if UNITY_EDITOR
         RotateCamera(camera);
-
-        // Lean the camera.
+#elif UNITY_ANDROID || UNITY_IOS
+        Input.gyro.enabled = true;
+        RotateCamera_Mobile(camera);
+#else
+        RotateCamera(camera);
+#endif
     }
 
     public override void Enter(IStateMachineEntity entity)
     {
         rotationY = 0;
+
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
 
 #if UNITY_WEBGL
         sensitivityX = webGL_sensitivityX;
@@ -74,6 +83,12 @@ public class GameCameraFirstPersonState : AbsState
     public override void Exit(IStateMachineEntity entity)
     {
         m_shooter = null;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // Hide the First Person Canvas.
+        GameManager.Instance.GameCanvas.FirstPersonCanvas.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -87,5 +102,17 @@ public class GameCameraFirstPersonState : AbsState
         rotationY = Mathf.Clamp(rotationY, minimumY, maximumY);
 
         camera.transform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
+    }
+
+    /// <summary>
+    /// Rotate the camera with gyro.
+    /// </summary>
+    /// <param name="camera"></param>
+    private void RotateCamera_Mobile(GameCamera camera)
+    {
+        camera.transform.Rotate(
+            -Input.gyro.rotationRateUnbiased.x * GyroRotationSpeedX,
+            -Input.gyro.rotationRateUnbiased.y * GyroRotationSpeedY,
+            0);// -Input.gyro.rotationRateUnbiased.z * GyroRotationSpeedY);
     }
 }
